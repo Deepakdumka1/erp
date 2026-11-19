@@ -220,6 +220,14 @@ class ERPTests(unittest.TestCase):
         self.assertEqual(self.client.get('/api/stream').status_code, 401)
 
 
+    def test_origin_host_match_ignores_scheme(self):
+        ok = self.client.post('/api/teacher/notice', json=dict(title='A', message='B'), headers={'Origin': 'https://localhost'})
+        self.assertEqual(ok.status_code, 200)
+        bad = self.client.post('/api/teacher/notice', json=dict(title='A', message='B'), headers={'Origin': 'https://evil.example'})
+        self.assertEqual(bad.status_code, 403)
+        null = self.client.post('/api/teacher/notice', json=dict(title='A', message='B'), headers={'Origin': 'null'})
+        self.assertEqual(null.status_code, 403)
+
     def test_health_and_proxy_origin(self):
         self.assertEqual(self.client.get('/healthz').get_json()['status'], 'ok')
         from werkzeug.middleware.proxy_fix import ProxyFix

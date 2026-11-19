@@ -12,18 +12,9 @@ git config user.name >/dev/null 2>&1 || git config user.name "Deepakdumka1"
 git config user.email >/dev/null 2>&1 || git config user.email "Deepakdumka1@users.noreply.github.com"
 if git remote get-url origin >/dev/null 2>&1; then git remote set-url origin "$REMOTE"; else git remote add origin "$REMOTE"; fi
 git add -A
-git rm -r -q --cached college.db instance uploads .venv __pycache__ generated_images 2>/dev/null
+git rm -r -q --cached college.db instance uploads .venv __pycache__ generated_images push_log.txt commit_message.txt 2>/dev/null
 git status --short | head -50
-git commit -q -m "EduSense AI: minimal black and white UI, real-time updates, production hardening
-
-- Monochrome design system, light and dark themes, bundled DM Sans
-- Live updates over Server-Sent Events, attendance sessions, student drawer,
-  report cards, command palette, deletes and password change
-- Security headers, sign-in rate limit, persistent secret key, waitress,
-  proxy support, health check and Render blueprint
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
-Claude-Session: https://claude.ai/code/session_01GbS2DwLGjUNx74L5zTciaR" || echo "(nothing new to commit)"
+if [ -f commit_message.txt ]; then git commit -q -F commit_message.txt; else git commit -q -m "Update EduSense AI"; fi || echo "(nothing new to commit)"
 git branch -M main
 echo "== Checking GitHub =="
 if git fetch -q origin 2>/dev/null && git rev-parse -q --verify origin/main >/dev/null; then

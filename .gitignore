@@ -8,3 +8,5 @@ college.db
 .DS_Store
 generated_images/
 *.pdf
+push_log.txt
+commit_message.txt

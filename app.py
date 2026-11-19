@@ -10,6 +10,7 @@ import time
 from collections import defaultdict, deque
 from datetime import datetime, timedelta
 from functools import wraps
+from urllib.parse import urlsplit
 from uuid import uuid4
 from flask import Flask, Response, g, jsonify, redirect, render_template, request, send_from_directory, session, url_for, make_response
 from security import check_password_hash, generate_password_hash
@@ -83,11 +84,24 @@ def api(*roles):
     return decorate
 
 
+def same_origin(origin):
+    """Compare the browser's Origin host with the host the request was sent to.
+    Hosting proxies may rewrite the scheme, so the host (domain and port) decides."""
+    if origin == "null":
+        return False
+    allowed = {request.host.lower()}
+    forwarded = request.headers.get("X-Forwarded-Host", "")
+    if forwarded and os.environ.get("EDUSENSE_PROXY") == "1":
+        allowed.update(h.strip().lower() for h in forwarded.split(","))
+    return urlsplit(origin).netloc.lower() in allowed
+
+
 @app.before_request
 def check_origin():
     if request.method in ("POST", "PUT", "DELETE"):
         origin = request.headers.get("Origin")
-        if origin and origin != request.host_url.rstrip("/"):
+        if origin and not same_origin(origin):
+            log.warning("Blocked cross-site %s %s from %s (host %s)", request.method, request.path, origin, request.host)
             return jsonify(error="Cross-site changes are not allowed."), 403
 
 
