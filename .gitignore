@@ -1,0 +1,10 @@
+instance/
+uploads/
+.venv/
+__pycache__/
+*.pyc
+college.db
+*.db-journal
+.DS_Store
+generated_images/
+*.pdf

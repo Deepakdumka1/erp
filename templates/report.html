@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Report card · {{ r.profile.name }} · EduSense AI</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css', v='60') }}">
+  <style>
+    body { background: #E9ECF2; color: #121A2B; }
+    .sheet { max-width: 820px; margin: 32px auto; background: #fff; border-radius: 16px; box-shadow: 0 20px 50px -20px rgba(18,26,43,.25); overflow: hidden; }
+    .sheet-head { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 28px 36px; background: #0A0A0A; color: #fff; }
+    .sheet-head .brand-name small { color: #BDBDBD; } .sheet-head .crest { background: #fff; color: #0A0A0A; }
+    .sheet-head .doc { text-align: right; font-size: 12px; color: #C9D1E3; }
+    .sheet-head .doc b { display: block; font-size: 22px; color: #fff; font-weight: 600; }
+    .sheet-body { padding: 32px 36px 36px; display: grid; gap: 28px; }
+    .who { display: flex; justify-content: space-between; gap: 24px; flex-wrap: wrap; padding-bottom: 24px; border-bottom: 1px solid #E1E5EE; }
+    .who h1 { font-size: 30px; letter-spacing: -0.03em; }
+    .who p { color: #4F5B73; margin-top: 4px; }
+    .standing { text-align: right; }
+    .standing > span:first-child { display: block; font-size: 12px; color: #4F5B73; margin-bottom: 6px; }
+    .sum { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .sum div { border: 1px solid #E1E5EE; border-radius: 12px; padding: 14px 16px; }
+    .sum span { font-size: 12px; color: #4F5B73; display: block; }
+    .sum b { font-size: 24px; font-weight: 650; letter-spacing: -0.02em; font-variant-numeric: lining-nums tabular-nums; }
+    h2 { font-size: 15px; margin-bottom: 10px; }
+    .reasons-print { padding-left: 18px; color: #4F5B73; }
+    .sign { display: flex; justify-content: space-between; gap: 24px; padding-top: 36px; font-size: 12px; color: #4F5B73; }
+    .sign div { border-top: 1px solid #CBD2E0; padding-top: 8px; width: 200px; text-align: center; }
+    .note { font-size: 12px; color: #4F5B73; }
+    .toolbar { max-width: 820px; margin: 24px auto -8px; display: flex; justify-content: space-between; gap: 12px; padding: 0 4px; }
+    @media (max-width: 640px) { .sheet { margin: 12px; } .sheet-head, .sheet-body { padding: 20px; } .sum { grid-template-columns: repeat(2, 1fr); } .standing { text-align: left; } }
+    @media print { body { background: #fff; } .toolbar { display: none; } .sheet { box-shadow: none; margin: 0; max-width: none; border-radius: 0; } .sheet-head { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <a class="btn btn-secondary btn-sm" href="{{ url_for('portal') }}">Back to workspace</a>
+    <button type="button" class="btn btn-primary btn-sm" id="print-report">Print or save as PDF</button>
+  </div>
+  <article class="sheet">
+    <header class="sheet-head">
+      <span class="brand"><span class="crest" aria-hidden="true">ES</span><span class="brand-name">EduSense AI<small>Academic workspace</small></span></span>
+      <div class="doc"><b>Report card</b>Generated {{ generated }}</div>
+    </header>
+    <div class="sheet-body">
+      <section class="who">
+        <div><h1>{{ r.profile.name }}</h1><p>Roll number {{ r.profile.roll_no }}, class {{ r.profile.class_name }}</p></div>
+        <div class="standing"><span>Academic risk indicator</span><span class="badge {{ r.stats.risk.level|lower }}">{{ r.stats.risk.level }}</span></div>
+      </section>
+      <section class="sum" aria-label="Summary">
+        <div><span>Average marks</span><b>{{ r.stats.average_marks }}%</b></div>
+        <div><span>Attendance</span><b>{{ r.stats.attendance }}%</b></div>
+        <div><span>Assignments submitted</span><b>{{ r.stats.assignment_completion }}%</b></div>
+        <div><span>Fee balance</span><b>₹{{ '{:,.0f}'.format(r.fees.total - r.fees.paid) }}</b></div>
+      </section>
+      <section>
+        <h2>Subject results</h2>
+        {% if rows %}
+        <div class="table-wrap"><table>
+          <thead><tr><th scope="col">Subject</th><th scope="col" class="num">Assessments</th><th scope="col" class="num">Average marks</th><th scope="col" class="num">Classes attended</th><th scope="col" class="num">Attendance</th></tr></thead>
+          <tbody>
+          {% for row in rows %}
+            <tr><th scope="row">{{ row.subject }}</th><td class="num">{{ row.assessments }}</td><td class="num">{{ '%.1f'|format(row.average) ~ ' / 100' if row.average is not none else 'Not recorded' }}</td><td class="num">{{ row.attended }} / {{ row.total }}</td><td class="num">{{ '%.1f'|format(row.attendance) ~ '%' if row.attendance is not none else 'Not recorded' }}</td></tr>
+          {% endfor %}
+          </tbody>
+        </table></div>
+        {% else %}<p class="note">No marks or attendance recorded yet.</p>{% endif %}
+      </section>
+      <section>
+        <h2>Indicators behind the risk level</h2>
+        <ul class="reasons-print">{% for reason in r.stats.risk.reasons %}<li>{{ reason }}</li>{% endfor %}</ul>
+      </section>
+      <p class="note">The risk indicator comes from a Decision Tree trained on synthetic examples. It supports academic guidance and is not a final assessment. Records in this prototype are demo data unless imported from a verified register.</p>
+      <div class="sign"><div>Class teacher</div><div>Head of department</div></div>
+    </div>
+  </article>
+  <script src="{{ url_for('static', filename='report.js', v='60') }}"></script>
+</body>
+</html>

@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0A0A0A"><title>Sign in · EduSense AI</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%230A0A0A'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-family='Arial,sans-serif' font-weight='700' font-size='15' fill='%23FFFFFF'%3EES%3C/text%3E%3C/svg%3E">
+  <script src="{{ url_for('static', filename='theme.js', v='60') }}"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css', v='60') }}">
+</head>
+<body>
+<div class="login-page">
+  <section class="login-story" aria-label="About EduSense AI">
+    <a class="brand" href="/"><span class="crest" aria-hidden="true">ES</span><span class="brand-name">EduSense AI<small>Academic workspace</small></span></a>
+    <div class="login-quote">
+      <h2>Every record in its place, every student in view.</h2>
+      <p>Marks, attendance, coursework and fees for administrators, teachers and students, with early signals for anyone who may need support.</p>
+    </div>
+    <div class="login-meta"><span>Background: illustration made for this prototype, not a photograph of the college.</span><span>Flask and SQLite, running locally</span></div>
+  </section>
+
+  <main class="login-main">
+    <div class="login-card">
+      <a class="brand login-mobile-brand" href="/"><span class="crest" aria-hidden="true">ES</span><span class="brand-name">EduSense AI<small>Academic workspace</small></span></a>
+      <div class="login-card-head">
+        <h1>Welcome back</h1>
+        <p>Sign in to continue to your workspace.</p>
+      </div>
+      {% if error %}
+      <div class="alert error" role="alert" id="login-error">
+        <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
+        <span>{{ error }}</span>
+      </div>
+      {% endif %}
+      <form method="post" class="login-form" novalidate id="login-form">
+        <fieldset class="role-field">
+          <legend>I am signing in as</legend>
+          <div class="role-tabs">
+          <label><input type="radio" name="role" value="admin" {% if role == 'admin' %}checked{% endif %}>Admin</label>
+          <label><input type="radio" name="role" value="teacher" {% if role == 'teacher' %}checked{% endif %}>Teacher</label>
+          <label><input type="radio" name="role" value="student" {% if role == 'student' %}checked{% endif %}>Student</label>
+          </div>
+        </fieldset>
+        <div class="field">
+          <span><label for="username">Username</label></span>
+          <input id="username" name="username" required autocomplete="username" value="{{ username }}" aria-describedby="username-error{% if error %} login-error{% endif %}" {% if error %}aria-invalid="true"{% endif %}>
+          <span class="field-error" id="username-error" hidden>Enter your username.</span>
+        </div>
+        <div class="field">
+          <span><label for="password">Password</label></span>
+          <div class="password-wrap">
+            <input id="password" name="password" type="password" required autocomplete="current-password" aria-describedby="password-error{% if error %} login-error{% endif %}" {% if error %}aria-invalid="true"{% endif %}>
+            <button type="button" class="btn btn-ghost btn-sm password-toggle" id="password-toggle" aria-controls="password" aria-pressed="false">Show</button>
+          </div>
+          <span class="field-error" id="password-error" hidden>Enter your password.</span>
+        </div>
+        <button type="submit" class="btn btn-primary">Sign in</button>
+      </form>
+      <details class="login-demo">
+        <summary>Demo accounts
+          <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+        </summary>
+        <div class="login-demo-body">
+          <div class="demo-row"><span>Admin</span><code>admin / admin123</code><button type="button" class="btn btn-ghost btn-sm" data-demo="admin" data-user="admin" data-pass="admin123" aria-label="Fill admin demo account">Use</button></div>
+          <div class="demo-row"><span>Teacher</span><code>teacher3 / teacher123</code><button type="button" class="btn btn-ghost btn-sm" data-demo="teacher" data-user="teacher3" data-pass="teacher123" aria-label="Fill teacher demo account">Use</button></div>
+          <div class="demo-row"><span>Student</span><code>stu01 / student123</code><button type="button" class="btn btn-ghost btn-sm" data-demo="student" data-user="stu01" data-pass="student123" aria-label="Fill student demo account">Use</button></div>
+          <small>Prototype accounts. An administrator may have changed them.</small>
+        </div>
+      </details>
+    </div>
+  </main>
+</div>
+<script src="{{ url_for('static', filename='login.js', v='60') }}"></script>
+</body>
+</html>

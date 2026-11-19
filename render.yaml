@@ -1,0 +1,20 @@
+# One-click deploy on Render: New + > Blueprint > pick this repository.
+services:
+  - type: web
+    name: edusense-ai
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python app.py
+    healthCheckPath: /healthz
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.7
+      - key: HOST
+        value: 0.0.0.0
+      - key: EDUSENSE_PROXY
+        value: "1"
+      - key: EDUSENSE_HTTPS
+        value: "1"
+      - key: EDUSENSE_SECRET_KEY
+        generateValue: true

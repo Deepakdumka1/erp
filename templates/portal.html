@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0A0A0A">
+  <title>EduSense AI</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%230A0A0A'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-family='Arial,sans-serif' font-weight='700' font-size='15' fill='%23FFFFFF'%3EES%3C/text%3E%3C/svg%3E">
+  <script src="{{ url_for('static', filename='theme.js', v='60') }}"></script>
+  <link rel="preload" href="{{ url_for('static', filename='fonts/DMSans-var.woff') }}" as="font" type="font/woff" crossorigin>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css', v='60') }}">
+  <script defer src="{{ url_for('static', filename='app.js', v='60') }}"></script>
+</head>
+<body data-role="{{ role }}" data-name="{{ name }}" data-student-id="{{ student_id }}">
+  <a class="skip-link" href="#app">Skip to content</a>
+  <div class="layout">
+    <aside class="sidebar" id="sidebar" aria-label="Workspace navigation">
+      <div class="sidebar-brand"><a class="brand" href="/"><span class="crest" aria-hidden="true">ES</span><span class="brand-name">EduSense AI<small>{{ role|title }} workspace</small></span></a></div>
+      <div class="sidebar-scroll"><nav id="nav" aria-label="Main navigation"></nav></div>
+      <div class="sidebar-foot">
+        <div class="user-chip">
+          <span class="avatar" aria-hidden="true">{{ name[:1] }}</span>
+          <span><b>{{ name }}</b><small>{{ role|title }}</small></span>
+          <a href="{{ url_for('logout') }}" aria-label="Sign out" title="Sign out"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg></a>
+        </div>
+      </div>
+    </aside>
+    <div class="scrim" id="scrim"></div>
+    <div class="main-area">
+      <header class="topbar">
+        <button class="icon-btn menu-button" id="menu-button" aria-label="Open navigation" aria-expanded="false" aria-controls="sidebar"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+        <button class="cmd-trigger" id="cmd-trigger" aria-label="Search students and pages" aria-keyshortcuts="Control+K Meta+K">
+          <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+          <span>Search students, pages and actions</span><kbd id="cmd-key">Ctrl K</kbd>
+        </button>
+        <div class="topbar-tools">
+          <span class="live" id="live-state" role="status" title="Real-time updates"><span>Connecting</span></span>
+          <button class="icon-btn" id="theme-toggle" aria-label="Switch to dark theme"></button>
+          <div class="bell-wrap">
+            <button class="icon-btn" id="bell" aria-label="Notifications" aria-expanded="false" aria-controls="bell-panel"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 8-3 9h18c0-1-3-2-3-9"/><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"/></svg><span class="count-dot" id="bell-count" hidden>0</span></button>
+            <div class="popover" id="bell-panel" hidden></div>
+          </div>
+        </div>
+      </header>
+      <main id="app" class="page-content" tabindex="-1" aria-busy="true">
+        <div class="loading" aria-label="Loading workspace"><div class="sk hero"></div><div class="sk-row"><div class="sk"></div><div class="sk"></div><div class="sk"></div><div class="sk"></div></div></div>
+      </main>
+      <footer class="app-footer"><span>EduSense AI, final-year B.Tech project</span><span id="identity"></span></footer>
+    </div>
+  </div>
+
+  <dialog id="attendance-dialog" aria-labelledby="attendance-dialog-title">
+    <form method="dialog" id="attendance-dialog-form" novalidate>
+      <div class="dialog-body">
+        <h2 id="attendance-dialog-title">Correct attendance</h2>
+        <p id="attendance-dialog-desc"></p>
+        <label class="field"><span>Classes attended</span><input name="attended" type="number" min="0" step="1" required aria-describedby="attendance-dialog-error"></label>
+        <label class="field"><span>Total classes</span><input name="total" type="number" min="1" step="1" required aria-describedby="attendance-dialog-error"></label>
+        <p class="field-error" id="attendance-dialog-error" role="alert"></p>
+      </div>
+      <div class="dialog-actions"><button type="button" class="btn btn-secondary" data-dialog-cancel>Cancel</button><button type="submit" class="btn btn-primary">Save changes</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="confirm-dialog" aria-labelledby="confirm-title" aria-describedby="confirm-text">
+    <div class="dialog-body"><h2 id="confirm-title">Delete?</h2><p id="confirm-text"></p></div>
+    <div class="dialog-actions"><button type="button" class="btn btn-secondary" data-confirm="no">Cancel</button><button type="button" class="btn btn-danger" data-confirm="yes" id="confirm-yes">Delete</button></div>
+  </dialog>
+
+  <dialog id="student-drawer" class="drawer" aria-labelledby="drawer-title"></dialog>
+
+  <dialog id="palette" class="palette" aria-label="Search">
+    <div class="palette-input"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <input id="palette-input" type="text" role="combobox" aria-label="Search students, pages and actions" aria-expanded="true" aria-controls="palette-list" aria-autocomplete="list" placeholder="Search students, pages and actions" autocomplete="off"></div>
+    <ul class="palette-list" id="palette-list" role="listbox" aria-label="Results"></ul>
+    <div class="palette-foot"><span><kbd>↑</kbd> <kbd>↓</kbd> to move</span><span><kbd>Enter</kbd> to open</span><span><kbd>Esc</kbd> to close</span></div>
+  </dialog>
+
+  <div class="toast-stack" id="toasts" aria-live="polite"></div>
+</body>
+</html>

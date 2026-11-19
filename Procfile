@@ -1,0 +1,1 @@
+web: HOST=0.0.0.0 EDUSENSE_PROXY=1 EDUSENSE_HTTPS=1 python app.py
